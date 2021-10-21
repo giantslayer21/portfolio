@@ -1,2 +1,0 @@
-# portfolio
-A Simple Portfolio
