@@ -92,7 +92,7 @@
 
 			const vector = new THREE.Vector4();
 
-			const instances = 50000;
+			const instances = 1000;
 
 			const positions = [];
 			const offsets = [];
@@ -113,8 +113,9 @@
 				offsets.push( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
 
 				// colors
-
-				colors.push( Math.random(), Math.random(), Math.random(), Math.random() );
+				colors.push( 255,209,0,1 );
+                if (i%2==0){
+                colors.push(51, 53, 51)}
 
 				// orientation start
 
