@@ -4,42 +4,47 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="shortcut icon" href="./assets/ebelogo_black.svg" type="image/x-icon">
+	<link rel="shortcut icon" href="./assets/logo2.svg" type="image/x-icon">
 	<title>thebenezer</title>
 	<link rel="stylesheet" href="./css/style.css">
-	<style>
-		#info{
-			position: absolute;
-		}
-		#canvas{
-			position: absolute;
-			/* z-index: -1; */
-		}
-	</style>
 </head>
 <body>
 	<header>
 		<nav>
 			<a href="index.html" class="logo">
-				<img src="./assets/ebelogo.svg" alt="">
+				<img src="./assets/logo2.svg" alt="">
 			</a>
 			<ul class="navlinks">
 				<li class="link"><a href="about.html">about</a></li>
 				<li class="link"><a href="works.html">works</a></li>
 				<li class="link"><a href="blog.html">experiments</a></li>
 			</ul>
-			
-			<!-- <a href="#" class="hexclip">
-				<div class="hamburger">
-					<span class="line1"></span>
-					<span class="line2"></span>
-					<span class="line3"></span>
-				</div>
-				<div class="clip-caption">work</div>
-			</a> -->
+			<div class="hamburger">
+                <span class="line1"></span>
+                <span class="line2"></span>
+                <span class="line3"></span>
+            </div>
 		</nav>
 	</header>
 	<!-- ****************** CONTACT ******************* --> 
+    <div class="contactwindow">
+        <form action="profile.html" class="ls-form">
+            <div class="close-form" onclick="closeForm()">
+                <span class="close-l1"></span>
+                <span class="close-l2"></span>
+            </div>
+            <h3>contact</h3>
+             <label class="ls-label">
+                <div class="ls-label-text">e-mail :</div>
+                <input type="email" required />
+            </label>
+            <label class="ls-label">
+                <div class="ls-label-text">message :</div>
+                <input type="text" required />
+            </label>    
+            <button type="submit" class="btn">Contact</button>
+        </form>
+    </div>
 
 	<!-- ****************** Landing Section ******************* -->
 	<main class="landing-section">
@@ -49,22 +54,21 @@
 			<h2>A creative and an intellect with a strong desire to change the world with code.</h2>
 			<a class="btn-mix-noRadius" onclick="openContactForm()">contact</a>
 		</section> -->
+
 		<!-- <section class="graphic">
-			<canvas id="canvas"></canvas>
-		<div id="info"></div>
+			<canvas id="canvas">
+
+			</canvas>
 		</section> -->
 		<section class="content">
-			<h1><img src="./assets/ebelogo.svg" alt="" srcset="" style="height: 100px;"></h1>
+			<h1><img src="./assets/logo2.svg" alt="" srcset="" style="height: 100px;"></h1>
 			<p>ebenezer</p>
 			<!-- <p>A creative and an intellect with a strong desire to change the world with code.</p> -->
 			<p>Lorem ipsum dolor, sit amet consectetur </p>
 			<p>Lorem ipsum dolor, sit</p><br><br>
-			<!-- <a class="cta" onclick="openContactForm()">contact</a> -->
-			<!-- <span style="color: #6C6; font-size: 135px;">&#x2B22;</span> -->
-			<a class="cta" onclick="openContactForm()"><label for="cta">contact</label></a>
+			<a class="bn5" onclick="openContactForm()">contact</a>
 		</section>
 	</main>
-
 
 	<!-- ****************** WORK SECTION ******************* -->
 	<section class="work-section">
@@ -82,7 +86,5 @@
 			<li><a href="#"></a></li>
 		</ul>
 	</footer>
-
-
 </body>
 </html>

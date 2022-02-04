@@ -1,0 +1,5 @@
+https://otsumitsu.com/dismantle-3d-model-into-fragments/
+https://codepen.io/rachsmith/post/beginning-with-3d-webgl-pt-2-geometry
+https://www.youtube.com/watch?v=PwG3R495glA&ab_channel=ramacad
+https://sbcode.net/threejs/animate-on-scroll/
+https://tympanus.net/codrops/2022/01/05/crafting-scroll-based-animations-in-three-js/
