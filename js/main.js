@@ -1,11 +1,11 @@
-import * as THREE from '../js/three/build/three.module.js';
-import { OrbitControls } from '../js/three/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './three/build/three.module.js';
+import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
 
-import Stats from '.././js/three/examples/jsm/libs/stats.module.js';
-import * as dat from '../js/three/examples/jsm/libs/dat.gui.module.js';
+import Stats from './three/examples/jsm/libs/stats.module.js';
+import * as dat from './three/examples/jsm/libs/dat.gui.module.js';
 
-import vs from '../js/shaders/vertex.js';
-import fs from '../js/shaders/frag.js';
+import vs from './shaders/vertex.js';
+import fs from './shaders/frag.js';
 
 /*
 * Debug
