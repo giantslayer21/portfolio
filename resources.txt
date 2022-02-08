@@ -6,3 +6,4 @@ https://tympanus.net/codrops/2022/01/05/crafting-scroll-based-animations-in-thre
 https://bl.ocks.org/HarryStevens/f9a31f69cf7645c34e473c1250b2ab30
 lerp
 Lewis Lepton
+https://learnopengl.com/

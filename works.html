@@ -21,44 +21,32 @@
 		</a>
 		<!-- <p>hi</p> -->
 	</div>
-	<header>
+	<!-- <header>
 		<nav>
 			<ul class="navlinks">
 				<li class="link"><a href="about.html">about</a></li>
 				<li class="link"><a href="works.html">works</a></li>
 				<li class="link"><a href="blog.html">experiments</a></li>
 			</ul>
-			
-			<!-- <a href="#" class="hexclip">
-				<div class="hamburger">
-					<span class="line1"></span>
-					<span class="line2"></span>
-					<span class="line3"></span>
-				</div>
-				<div class="clip-caption">work</div>
-			</a> -->
 		</nav>
-	</header>
+	</header> -->
 	<!-- ****************** CANVAS ******************* --> 
 
 	<canvas id="canvas"></canvas>
 	<div id="info"></div>
 	
 	<!-- ****************** Landing Section ******************* -->
-	<main class="landing-section">
+	<!-- <main class="landing-section">
 
 		<section class="content">
 			<h1><img src="./assets/ebelogo_black.svg" alt="" srcset="" style="height: 100px;"></h1>
 			<p>ebenezer</p>
-			<!-- <p>A creative and an intellect with a strong desire to change the world with code.</p> -->
+			<p>A creative and an intellect with a strong desire to change the world with code.</p>
 			<p>Lorem ipsum dolor, sit amet consectetur </p>
 			<p>Lorem ipsum dolor, sit</p><br><br>
 			<div class="link"><a href="#">View Works</a></div>
-			<!-- <a class="cta" onclick="openContactForm()">contact</a> -->
-			<!-- <span style="color: #6C6; font-size: 135px;">&#x2B22;</span> -->
-			<!-- <a class="cta" onclick="openContactForm()"><label for="cta">contact</label></a> -->
 		</section>
-	</main>
+	</main> -->
 
 
 	<!-- ****************** WORK SECTION ******************* -->
@@ -82,29 +70,6 @@
 	<!-- **************** SCRIPTS ***************** -->
     <!-- <script src="./js/menu.js"></script>
     <script src="./js/scroll.js"></script> -->
-	<script id="vertexShader" type="x-shader/x-vertex">
-
-		uniform mat4 projectionMatrix;
-		uniform mat4 viewMatrix;
-		uniform mat4 modelMatrix;
-		
-		attribute vec3 position;
-
-		void main(){
-			gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
-		}
-
-		</script>
-
-		<script id="fragmentShader" type="x-shader/x-fragment">
-
-			precision mediump float;
-
-            void main(){
-                gl_FragColor = vec4(1.0,0.0,0.0,1.0);
-            }
-
-		</script>
     <script src="./js/main.js" type="module"></script>
 
 </body>
