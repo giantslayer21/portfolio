@@ -3,3 +3,6 @@ https://codepen.io/rachsmith/post/beginning-with-3d-webgl-pt-2-geometry
 https://www.youtube.com/watch?v=PwG3R495glA&ab_channel=ramacad
 https://sbcode.net/threejs/animate-on-scroll/
 https://tympanus.net/codrops/2022/01/05/crafting-scroll-based-animations-in-three-js/
+https://bl.ocks.org/HarryStevens/f9a31f69cf7645c34e473c1250b2ab30
+lerp
+Lewis Lepton
