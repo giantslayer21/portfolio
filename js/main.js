@@ -2,7 +2,7 @@ import * as THREE from './three/build/three.module.js';
 import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
 
 import Stats from './three/examples/jsm/libs/stats.module.js';
-import * as dat from './three/examples/jsm/libs/dat.gui.module.js';
+import * as dat from './three/examples/jsm/libs/lil-gui.module.min.js';
 
 import vs from './shaders/vertex.js';
 import fs from './shaders/frag.js';
@@ -12,8 +12,8 @@ import fs from './shaders/frag.js';
 */
 const gui=new dat.GUI();
 const debugObject = {
-    deepcolor: 0x0000ff,
-    surfacecolor: 0x8888ff
+    deepcolor: 0x142e39,
+    surfacecolor: 0x98caf0
 }
 
 /*
@@ -63,7 +63,7 @@ function init() {
     const tex= textureLoader.load('/js/three/examples/textures/lava/lavatile.jpg')
 
 
-    const geometry = new THREE.PlaneBufferGeometry( 2, 2,128,128 );
+    const geometry = new THREE.PlaneBufferGeometry( 2, 2,512,512 );
     
     uniforms = {
         u_time:      {value: 1.0 },
@@ -91,14 +91,16 @@ function init() {
     scene.add( plane );
 
     // debug
-    gui.add(material.uniforms.u_freq.value,'x').min(0).max(20).step(0.1).name('freq_x');
-    gui.add(material.uniforms.u_freq.value,'y').min(0).max(20).step(0.1).name('freq_y');
-    gui.add(material.uniforms.u_amp,'value').min(0).max(1).step(0.001).name('amp');
-    gui.add(material.uniforms.u_speed,'value').min(0).max(20).step(0.01).name('speed_x');
+    const folderWater = gui.addFolder( 'Water' );
+    folderWater.add(material.uniforms.u_freq.value,'x').min(0).max(20).step(0.1).name('freq_x');
+    folderWater.add(material.uniforms.u_freq.value,'y').min(0).max(20).step(0.1).name('freq_y');
+    folderWater.add(material.uniforms.u_amp,'value').min(0).max(1).step(0.0001).name('amp');
+    folderWater.add(material.uniforms.u_speed,'value').min(0).max(20).step(0.01).name('speed_x');
     
-    gui.add(plane.position,'y').min(-3).max(3).step(0.01).name("Y-coord");
-    gui.add(plane,'visible');
-    gui.add(material,'wireframe');
+    const folderMesh = gui.addFolder( 'Mesh' );
+    folderMesh.add(plane.position,'y').min(-3).max(3).step(0.01).name("Y-coord");
+    folderMesh.add(plane,'visible');
+    folderMesh.add(material,'wireframe');
 
     gui.add(material.uniforms.u_colorMultiplier,'value').min(0).max(50).step(0.001).name('col_multi');
     gui.add(material.uniforms.u_colorOffset,'value').min(0).max(1).step(0.0001).name('col_offset');
