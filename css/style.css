@@ -26,7 +26,6 @@
     font-family: var(--font), sans-serif;
     letter-spacing: 1px;
 }
-
 body{
     background-color: var(--backgnd);
     color: var(--foregnd);

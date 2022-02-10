@@ -3,12 +3,12 @@ export default `
 #define PI 3.1415926535897932384626433832795
 
 
-uniform float u_mouse;
-uniform float u_time;
-uniform vec3 u_deepcolor;
-uniform vec3 u_surfacecolor;
-uniform float u_colorOffset;
-uniform float u_colorMultiplier;
+uniform float uMouse;
+uniform float uTime;
+uniform vec3 uDeepColor;
+uniform vec3 uSurfaceColor;
+uniform float uColorOffset;
+uniform float uColorMultiplier;
 
 
 
@@ -72,6 +72,6 @@ float cnoise(vec2 P){
 
 void main()
 {
-    vec3 mixedColor = mix(u_deepcolor, u_surfacecolor, v_elevation * u_colorMultiplier + u_colorOffset);
+    vec3 mixedColor = mix(uDeepColor, uSurfaceColor, (v_elevation + uColorOffset)* uColorMultiplier);
     gl_FragColor = vec4(mixedColor, 1.0);
 }`

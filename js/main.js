@@ -21,7 +21,7 @@ const debugObject = {
 */
 const canvas = document.querySelector('#canvas' );
 let stats,info,plane;
-let camera, scene, renderer,controls,uniforms;
+let camera, scene, renderer,controls,material;
 
 function hasWebGL() {
     const gl =canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
@@ -52,12 +52,12 @@ function init() {
     const near = 0.1;
     const far = 5;
     camera = new THREE.PerspectiveCamera( fov, aspect, near, far);
-    camera.position.set(1,1,1);
+    camera.position.set(0,0,1);
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x000 );
-    // scene.fog = new THREE.Fog( 0xf3f3f3, 2000, 3500 );
-    scene.add( new THREE.AmbientLight( 0x111111 ) );
+    scene.fog = new THREE.Fog( 0xf3f3f3, 0.2, 2 );
+    // scene.add( new THREE.AmbientLight( 0x111111 ) );
 
     const textureLoader = new THREE.TextureLoader();
     const tex= textureLoader.load('/js/three/examples/textures/lava/lavatile.jpg')
@@ -65,24 +65,27 @@ function init() {
 
     const geometry = new THREE.PlaneBufferGeometry( 2, 2,512,512 );
     
-    uniforms = {
-        u_time:      {value: 1.0 },
-        u_mouse:     {value: new THREE.Vector2() },
-        
-        u_freq:      {value: new THREE.Vector2(7,3) },
-        u_amp:       {value: 0.2},
-        u_speed:       {value: 1.0},
+    
 
-        u_colorOffset:{value: 0.25},
-        u_colorMultiplier:{value: 2.0},
-        u_deepcolor:     {value: new THREE.Color(debugObject.deepcolor)},
-        u_surfacecolor:     {value: new THREE.Color(debugObject.surfacecolor)}
-    };
-
-    const material = new THREE.ShaderMaterial( {
-        uniforms: uniforms,
+    material = new THREE.ShaderMaterial( {
         vertexShader: vs,
-        fragmentShader: fs
+        fragmentShader: fs,
+        uniforms: {
+            uTime:      {value: 1.0 },
+            
+            uFreq:      {value: new THREE.Vector2(4,1.5) },
+            uAmp:       {value: 0.2},
+            uSpeed:       {value: 0.70},
+    
+            uNoiseFreq: {value: 3.0},
+            uNoiseAmp: {value: 0.2},
+            uNoiseSpeed: {value: 0.2},
+    
+            uColorOffset:{value: 0.08},
+            uColorMultiplier:{value: 2.0},
+            uDeepColor:     {value: new THREE.Color(debugObject.deepcolor)},
+            uSurfaceColor:     {value: new THREE.Color(debugObject.surfacecolor)}
+        }
     } );
 
     plane = new THREE.Mesh( geometry, material );
@@ -91,27 +94,38 @@ function init() {
     scene.add( plane );
 
     // debug
-    const folderWater = gui.addFolder( 'Water' );
-    folderWater.add(material.uniforms.u_freq.value,'x').min(0).max(20).step(0.1).name('freq_x');
-    folderWater.add(material.uniforms.u_freq.value,'y').min(0).max(20).step(0.1).name('freq_y');
-    folderWater.add(material.uniforms.u_amp,'value').min(0).max(1).step(0.0001).name('amp');
-    folderWater.add(material.uniforms.u_speed,'value').min(0).max(20).step(0.01).name('speed_x');
-    
     const folderMesh = gui.addFolder( 'Mesh' );
     folderMesh.add(plane.position,'y').min(-3).max(3).step(0.01).name("Y-coord");
     folderMesh.add(plane,'visible');
     folderMesh.add(material,'wireframe');
+    folderMesh.open( gui._closed );
 
-    gui.add(material.uniforms.u_colorMultiplier,'value').min(0).max(50).step(0.001).name('col_multi');
-    gui.add(material.uniforms.u_colorOffset,'value').min(0).max(1).step(0.0001).name('col_offset');
-    gui.addColor(debugObject,'surfacecolor')
+    const folderWater = gui.addFolder( 'Water' );
+    folderWater.add(material.uniforms.uFreq.value,'x').min(0).max(20).step(0.1).name('freq_x');
+    folderWater.add(material.uniforms.uFreq.value,'y').min(0).max(20).step(0.1).name('freq_y');
+    folderWater.add(material.uniforms.uAmp,'value').min(0).max(1).step(0.0001).name('amp');
+    folderWater.add(material.uniforms.uSpeed,'value').min(0).max(20).step(0.01).name('speed_x');
+    folderWater.open( gui._closed );
+
+    const folderNoise = gui.addFolder( 'Noise' );
+    folderNoise.add(material.uniforms.uNoiseFreq,'value').min(0).max(10).step(0.1).name('noise_freq');
+    folderNoise.add(material.uniforms.uNoiseAmp,'value').min(0).max(1).step(0.0001).name('noise_amp');
+    folderNoise.add(material.uniforms.uNoiseSpeed,'value').min(0).max(1).step(0.0001).name('noise_speed');
+    // folderNoise.open( gui._closed );
+
+    const folderColor = gui.addFolder( 'Color' );
+    folderColor.add(material.uniforms.uColorMultiplier,'value').min(0).max(20).step(0.001).name('col_multi');
+    folderColor.add(material.uniforms.uColorOffset,'value').min(0).max(1).step(0.0001).name('col_offset');
+    folderColor.addColor(debugObject,'surfacecolor')
         .onChange(()=>{
-            material.uniforms.u_surfacecolor.value.set(debugObject.surfacecolor)
+            material.uniforms.uSurfaceColor.value.set(debugObject.surfacecolor)
         });
-    gui.addColor(debugObject,'deepcolor')
+    folderColor.addColor(debugObject,'deepcolor')
         .onChange(()=>{
-            material.uniforms.u_deepcolor.value.set(debugObject.deepcolor)
+            material.uniforms.uDeepColor.value.set(debugObject.deepcolor)
         });
+    folderColor.open( gui._closed );
+
 
     orbitalcontrols();
     onWindowResize();
@@ -135,7 +149,7 @@ function onWindowResize() {
 function render(time) {
 
     time *= 0.001;  // convert time to seconds
-    uniforms.u_time.value = time;
+    material.uniforms.uTime.value = time;
     renderer.render( scene, camera );
     controls.update();// only required if controls.enableDamping = true, or if controls.autoRotate = true
     stats.update();

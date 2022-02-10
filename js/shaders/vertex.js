@@ -1,9 +1,13 @@
 export default `
 
-uniform float u_time;
-uniform vec2 u_freq;
-uniform float u_amp;
-uniform float u_speed;
+uniform float uTime;
+uniform vec2 uFreq;
+uniform float uAmp;
+uniform float uSpeed;
+
+uniform float uNoiseFreq;
+uniform float uNoiseAmp;
+uniform float uNoiseSpeed;
 
 varying vec2 v_uv;
 varying float v_elevation;
@@ -87,11 +91,18 @@ float cnoise(vec3 P){
 void main(){
     vec4 modelPos = modelMatrix * vec4(position, 1.0);
     
-    float elevation= (sin(modelPos.x * u_freq.x + u_time * u_speed) * 
-                     sin(modelPos.z * u_freq.y + u_time * u_speed)) * 
-                     u_amp;
+    float elevation= (sin(modelPos.x * uFreq.x + uTime * uSpeed) * 
+                     sin(modelPos.z * uFreq.y + uTime * uSpeed)) * 
+                     uAmp; 
 
-    elevation-=abs( cnoise (vec3(modelPos.xz*5.0,u_time*0.2)) * 0.2);
+    for(float i = 1.0; i <= 4.0; i++){
+        elevation-=abs( 
+                cnoise( 
+                    vec3(modelPos.xz*uNoiseFreq * i,
+                        uTime*uNoiseSpeed)                      
+                    ) * uNoiseAmp
+                )/i;        
+    }
 
     modelPos.y +=elevation;  
     
