@@ -1,3 +1,16 @@
+CONTROLS
+https://discourse.threejs.org/t/how-to-control-a-first-person-camera-on-touch-devices/19080
+https://www.cssscript.com/touch-joystick-controller/
+https://github.com/Squarific/Touchscreen-Joystick
+https://github.com/bobboteck/JoyStick
+https://github.com/yoannmoinet/nipplejs
+
+
+PHYSICS
+
+
+
+SHADERS
 https://otsumitsu.com/dismantle-3d-model-into-fragments/
 https://codepen.io/rachsmith/post/beginning-with-3d-webgl-pt-2-geometry
 https://www.youtube.com/watch?v=PwG3R495glA&ab_channel=ramacad
