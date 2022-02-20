@@ -9,6 +9,10 @@ https://github.com/yoannmoinet/nipplejs
 PHYSICS
 
 
+ANIMATION
+https://sbcode.net/threejs/gltf-animation/
+https://tympanus.net/codrops/2019/10/14/how-to-create-an-interactive-3d-character-with-three-js/
+
 
 SHADERS
 https://otsumitsu.com/dismantle-3d-model-into-fragments/
