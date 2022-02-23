@@ -4,6 +4,9 @@ import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
 import Stats from './three/examples/jsm/libs/stats.module.js';
 import * as dat from './three/examples/jsm/libs/lil-gui.module.min.js';
 
+import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
+
+
 import vs from './shaders/vertex.js';
 import fs from './shaders/frag.js';
 
@@ -47,18 +50,86 @@ function init() {
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
 
-    const fov = 75;
+    const fov = 60;
     const aspect = window.innerWidth / window.innerHeight;  // the canvas default
     const near = 0.1;
-    const far = 5;
+    const far = 500;
     camera = new THREE.PerspectiveCamera( fov, aspect, near, far);
-    camera.position.set(0,0,1);
+    camera.position.set(0,0,50);
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0xf3f3f3 );
-    scene.fog = new THREE.Fog( 0xf3f3f3, 0.2, 2 );
-    // scene.add( new THREE.AmbientLight( 0x111111 ) );
+    scene.fog = new THREE.Fog( 0xf3f3f3, 50, 100 );
+    scene.add( new THREE.AmbientLight( 0xffffff, 0.5 ) );
 
+    const loader = new GLTFLoader();
+
+    loader.load( '../assets/WorldModel/world.glb', function ( gltf ) {
+        // gltf.scale(0.1,0.1,0.1)
+        gltf.scene.position.set(0,-20,0)
+        gltf.scene.rotation.set(0,20,0)
+        scene.add( gltf.scene );
+    
+    }, undefined, function ( error ) {
+    
+        console.error( error );
+    
+    } );
+
+        // water();
+    
+
+    orbitalcontrols();
+    onWindowResize();
+    window.addEventListener( 'resize', onWindowResize,false );
+
+}
+
+
+function onWindowResize() {
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+}
+
+
+function render(time) {
+
+    time *= 0.001;  // convert time to seconds
+    // material.uniforms.uTime.value = time;
+    renderer.render( scene, camera );
+    controls.update();// only required if controls.enableDamping = true, or if controls.autoRotate = true
+    stats.update();
+    requestAnimationFrame( render );
+}
+
+function orbitalcontrols() {
+    // Setup orbital controls
+    controls = new OrbitControls(camera, renderer.domElement);
+    controls.listenToKeyEvents( window ); // optional
+
+    controls.enableKeys = false;
+    controls.enablePan = false;
+    controls.enableZoom = true;
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    // controls.enableRotate = true;
+    // controls.autoRotate = true;
+    // controls.autoRotateSpeed =0.1;
+    controls.screenSpacePanning = true;
+    // controls.minDistance = 200;
+    // controls.maxDistance = 350;
+    controls.maxPolarAngle = Math.PI;
+    // controls.minPolarAngle = -Math.PI / 2;
+
+}
+
+function water() {
     const textureLoader = new THREE.TextureLoader();
     const tex= textureLoader.load('/js/three/examples/textures/lava/lavatile.jpg')
 
@@ -126,48 +197,4 @@ function init() {
         });
     folderColor.open( gui._closed );
 
-
-    orbitalcontrols();
-    onWindowResize();
-    window.addEventListener( 'resize', onWindowResize,false );
-
-}
-
-
-function onWindowResize() {
-
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-
-    renderer.setSize( window.innerWidth, window.innerHeight );
-
-    renderer.setSize( window.innerWidth, window.innerHeight );
-
-}
-
-
-function render(time) {
-
-    time *= 0.001;  // convert time to seconds
-    material.uniforms.uTime.value = time;
-    renderer.render( scene, camera );
-    controls.update();// only required if controls.enableDamping = true, or if controls.autoRotate = true
-    stats.update();
-    requestAnimationFrame( render );
-}
-
-function orbitalcontrols() {
-    // Setup orbital controls
-    controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableKeys = false;
-    controls.enablePan = false;
-    controls.enableZoom = true;
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.enableRotate = true;
-    // controls.autoRotate = true;
-    controls.autoRotateSpeed =2;
-    // controls.screenSpacePanning = true;
-    // controls.minDistance = 200;
-    // controls.maxDistance = 350;
 }
