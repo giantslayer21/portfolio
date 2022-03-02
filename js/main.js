@@ -66,8 +66,8 @@ function init() {
 
     loader.load( '../assets/WorldModel/world.glb', function ( gltf ) {
         // gltf.scale(0.1,0.1,0.1)
-        gltf.scene.position.set(0,-20,0)
-        gltf.scene.rotation.set(0,20,0)
+        // gltf.scene.position.set(0,-20,0)
+        // gltf.scene.rotation.set(0,20,0)
         scene.add( gltf.scene );
     
     }, undefined, function ( error ) {
