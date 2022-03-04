@@ -59,12 +59,12 @@ function init() {
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0xf3f3f3 );
-    scene.fog = new THREE.Fog( 0xf3f3f3, 50, 100 );
-    scene.add( new THREE.AmbientLight( 0xffffff, 0.5 ) );
+    scene.fog = new THREE.Fog( 0xf3f3f3, 200, 400 );
+    scene.add( new THREE.AmbientLight( 0xffffff, 0.9 ) );
 
     const loader = new GLTFLoader();
 
-    loader.load( '../assets/WorldModel/world.glb', function ( gltf ) {
+    loader.load( '../assets/VRWorld/portfolio.glb', function ( gltf ) {
         // gltf.scale(0.1,0.1,0.1)
         // gltf.scene.position.set(0,-20,0)
         // gltf.scene.rotation.set(0,20,0)
@@ -131,7 +131,7 @@ function orbitalcontrols() {
 
 function water() {
     const textureLoader = new THREE.TextureLoader();
-    const tex= textureLoader.load('/js/three/examples/textures/lava/lavatile.jpg')
+    // const tex= textureLoader.load('/js/three/examples/textures/lava/lavatile.jpg')
 
 
     const geometry = new THREE.PlaneBufferGeometry( 2, 2,512,512 );
