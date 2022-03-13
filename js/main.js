@@ -16,7 +16,9 @@ import fs from './shaders/frag.js';
 const gui=new dat.GUI();
 const debugObject = {
     deepcolor: 0x142e39,
-    surfacecolor: 0x98caf0
+    surfacecolor: 0x98caf0,
+    scenecolor: 0x000,
+    ambientlight: 0x96cbfd
 }
 
 /*
@@ -55,20 +57,83 @@ function init() {
     const near = 0.1;
     const far = 500;
     camera = new THREE.PerspectiveCamera( fov, aspect, near, far);
-    camera.position.set(0,0,50);
+    camera.position.set(60,20,80);
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0xf3f3f3 );
-    scene.fog = new THREE.Fog( 0xf3f3f3, 200, 400 );
-    scene.add( new THREE.AmbientLight( 0xffffff, 0.9 ) );
+    scene.background = new THREE.Color( debugObject.scenecolor );
+    // scene.fog = new THREE.FogExp2( 0xf3f3f3,0.01);
+    scene.add( new THREE.AmbientLight( debugObject.ambientlight, 0.9 ) );
 
+    const light=new THREE.DirectionalLight(0xffffff,0.5);
+    light.position.set(-50,50,50)
+    light.castShadow=true
+    const helper=new THREE.DirectionalLightHelper(light,5)
+    scene.add(light)
+
+
+    const sphereGeometry = new THREE.SphereGeometry( 5, 32, 32 );
+    const sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+    const sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+    sphere.position.set(0,20,20)
+    sphere.castShadow = true; //default is false
+    sphere.receiveShadow = false; //default
+    scene.add( sphere );
+
+    const geometry = new THREE.PlaneBufferGeometry( 1024, 1024 );
+    plane = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial({color: 0x0000FF}) );
+    plane.rotation.x= -Math.PI *0.5;
+    plane.receiveShadow = true;
+    
+    // plane.rotation.y= -Math.PI *0.5;
+    scene.add( plane );
+
+// console.log(scene.children[0].color)
+
+    gui.addColor(debugObject,'scenecolor')
+        .onChange(()=>{
+            scene.background.set(debugObject.scenecolor)
+        });
+    gui.addColor(debugObject,'ambientlight')
+        .onChange(()=>{
+            scene.children[0].color.set(debugObject.ambientlight)
+        });
+
+    /**
+     * Textures
+     */
+    // Texture loader
+const textureLoader = new THREE.TextureLoader()
+
+    const bakedTexture = textureLoader.load('../assets/VRWorld/Baked.jpg')
+    bakedTexture.flipY = false
+    bakedTexture.encoding = THREE.sRGBEncoding
+
+    /**
+     * Materials
+     */
+    // Baked material
+    const bakedMaterial = new THREE.MeshBasicMaterial({ map: bakedTexture })
+
+    // Portal light material
+    // const portalLightMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff })
+
+    // // Pole light material
+    // const poleLightMaterial = new THREE.MeshBasicMaterial({ color: 0xffffe5 })
+
+    /**
+     * Model
+     */
+ 
     const loader = new GLTFLoader();
 
-    loader.load( '../assets/VRWorld/portfolio.glb', function ( gltf ) {
-        // gltf.scale(0.1,0.1,0.1)
-        // gltf.scene.position.set(0,-20,0)
-        // gltf.scene.rotation.set(0,20,0)
-        scene.add( gltf.scene );
+    loader.load( '../assets/VRWorld/portfolio_v1(defaultmaterials).glb', function ( gltf ) {
+        gltf.scene.traverse((child)=>
+        {
+            child.material = bakedMaterial;
+        })
+        gltf.scene.castShadow=true
+        gltf.scene.receiveShadow=true
+        // scene.add( gltf.scene );
     
     }, undefined, function ( error ) {
     
@@ -77,6 +142,8 @@ function init() {
     } );
 
         // water();
+       
+
     
 
     orbitalcontrols();
@@ -134,7 +201,7 @@ function water() {
     // const tex= textureLoader.load('/js/three/examples/textures/lava/lavatile.jpg')
 
 
-    const geometry = new THREE.PlaneBufferGeometry( 2, 2,512,512 );
+    const geometry = new THREE.PlaneBufferGeometry( 512, 512,512,512 );
     
     
 
