@@ -62,9 +62,9 @@ function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color( debugObject.scenecolor );
     // scene.fog = new THREE.FogExp2( 0xf3f3f3,0.01);
-    scene.add( new THREE.AmbientLight( debugObject.ambientlight, 0.9 ) );
+    scene.add( new THREE.AmbientLight( debugObject.ambientlight, 0.2 ) );
 
-    const light=new THREE.DirectionalLight(0xffffff,0.5);
+    const light=new THREE.DirectionalLight(0xffffff,0.8);
     light.position.set(-50,50,50)
     light.castShadow=true
     const helper=new THREE.DirectionalLightHelper(light,5)
