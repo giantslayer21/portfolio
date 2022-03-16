@@ -24,15 +24,7 @@
 	</head>
 
 	<body>
-		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - skinning and morphing<br />
-			<p>
-				The animation system allows clips to be played individually, looped, or crossfaded with other clips. This example shows a character looping in one of several base animation states, then transitioning smoothly to one-time actions. Facial expressions are controlled independently with morph targets.
-			</p>
-			Model by
-			<a href="https://www.patreon.com/quaternius" target="_blank" rel="noopener">Tomás Laulhé</a>,
-			modifications by <a href="https://donmccurdy.com/" target="_blank" rel="noopener">Don McCurdy</a>. CC0.<br />
-		</div>
+		
 
 		<script type="module">
 
@@ -45,12 +37,12 @@
 			import { GLTFLoader } from './js/three/examples/jsm/loaders/GLTFLoader.js';
 
 			let container, stats, clock, gui, mixer, actions, activeAction, previousAction;
-			let camera, scene, renderer, model, face;
-
-			const api = { state: 'walk' };
+			let camera, scene, renderer, character;
 
 			init();
+
 			animate();
+
 
 			function init() {
 
@@ -58,7 +50,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 100 );
-				camera.position.set( - 5, 3, 10 );
+				camera.position.set( - 5, 3, 20 );
 				camera.lookAt( new THREE.Vector3( 0, 2, 0 ) );
 
 				scene = new THREE.Scene();
@@ -88,24 +80,24 @@
 				grid.material.transparent = true;
 				scene.add( grid );
 
-				// model
+				// character
 
 				const loader = new GLTFLoader();
 				loader.load( './assets/Character/character.glb', function ( gltf ) {
 
-					model = gltf.scene;
-					model.position.set(0,-3,0)
-					// model.scale(0.8)
-					scene.add( model );
-					console.log(gltf)
+					character = gltf.scene;
+					// character.scale.set(0.8,0.8,0.8)
 
-					createGUI( model, gltf.animations );
+					mixer = new THREE.AnimationMixer( character );
+					scene.add( character );
 
+					setupCharacterAnimations( character, gltf.animations );
 				}, undefined, function ( e ) {
 
 					console.error( e );
 
 				} );
+
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -121,14 +113,10 @@
 
 			}
 
-			function createGUI( model, animations ) {
+			function setupCharacterAnimations( character, animations ) {
 
-				const states = [ 'catch','death','fall','guard','hit','hit quard','idle','interact','jump_start','pull','push','put','run','throw','walk'];
+				// const states = [ 'catch','death','fall','guard','hit','hit_guard','idle','interact','jump_start','pull','push','put','run','throw','walk'];
 							
-				gui = new dat.GUI();
-
-				mixer = new THREE.AnimationMixer( model );
-
 				actions = {};
 
 				for ( let i = 0; i < animations.length; i ++ ) {
@@ -137,74 +125,27 @@
 					const action = mixer.clipAction( clip );
 					actions[ clip.name ] = action;
 
-					// if ( states.indexOf( clip.name ) >= 4 ) {
-
-					// 	action.clampWhenFinished = true;
-					// 	action.loop = THREE.LoopOnce;
-
-					// }
-
 				}
-
-				// states
-
-				const statesFolder = gui.addFolder( 'States' );
-
-				const clipCtrl = statesFolder.add( api, 'state' ).options( states );
-
-				clipCtrl.onChange( function () {
-
-					fadeToAction( api.state, 0.5 );
-
-				} );
-
-				statesFolder.open();
-
-				function restoreState() {
-
-					mixer.removeEventListener( 'finished', restoreState );
-
-					fadeToAction( api.state, 0.2 );
-
-				}
-
-
-				// expressions
-
-				// const expressions = Object.keys( face.morphTargetDictionary );
-				// const expressionFolder = gui.addFolder( 'Expressions' );
-
-				// for ( let i = 0; i < expressions.length; i ++ ) {
-
-				// 	expressionFolder.add( face.morphTargetInfluences, i, 0, 1, 0.01 ).name( expressions[ i ] );
-
-				// }
-
-				activeAction = actions[ 'walk' ];
+				activeAction = actions[ 'idle' ];
 				activeAction.play();
-
-				// expressionFolder.open();
 
 			}
 
-			function fadeToAction( name, duration ) {
+			function fadeToAction( name ) {
 
 				previousAction = activeAction;
 				activeAction = actions[ name ];
 
 				if ( previousAction !== activeAction ) {
 
-					previousAction.fadeOut( duration );
-
-				}
-
-				activeAction
+					previousAction.fadeOut(0.5);
+					activeAction
 					.reset()
 					.setEffectiveTimeScale( 1 )
 					.setEffectiveWeight( 1 )
-					.fadeIn( duration )
 					.play();
 
+				}
 			}
 
 			function onWindowResize() {
@@ -213,10 +154,9 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				// fadeToAction('run');
 
 			}
-
-			//
 
 			function animate() {
 
