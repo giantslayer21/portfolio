@@ -11,13 +11,12 @@ import vs from './shaders/vertex.js';
 import fs from './shaders/frag.js';
 
 /*
-* Debug
+* Debug GUI
 */
-const gui=new dat.GUI();
 const debugObject = {
     deepcolor: 0x142e39,
     surfacecolor: 0x98caf0,
-    scenecolor: 0x000,
+    scenecolor: 0x22243A,
     ambientlight: 0x96cbfd
 }
 
@@ -26,8 +25,9 @@ const debugObject = {
 */
 const canvas = document.querySelector('#canvas' );
 let stats,info,plane;
-let camera, scene, renderer,controls,material;
-
+let camera, scene, renderer,controls,materia;
+let actions,mixer,activeAction, previousAction;
+const clock=new THREE.Clock();
 function hasWebGL() {
     const gl =canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
     if (gl && gl instanceof WebGLRenderingContext) {
@@ -45,95 +45,78 @@ function init() {
     stats = new Stats();
     info.appendChild( stats.dom );
 
+    // ***** RENDERER ****** //
     renderer = new THREE.WebGLRenderer({
         canvas,
-        antialias: true
+        antialias: true,
         });
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
+    // renderer.shadowMap.enabled=true
 
+    // ***** CAMERA ****** //
     const fov = 60;
     const aspect = window.innerWidth / window.innerHeight;  // the canvas default
     const near = 0.1;
     const far = 500;
     camera = new THREE.PerspectiveCamera( fov, aspect, near, far);
-    camera.position.set(60,20,80);
+    camera.position.set(20,6,10);
 
+    // ***** SCENE & FOG ****** //
     scene = new THREE.Scene();
     scene.background = new THREE.Color( debugObject.scenecolor );
-    // scene.fog = new THREE.FogExp2( 0xf3f3f3,0.01);
-    scene.add( new THREE.AmbientLight( debugObject.ambientlight, 0.2 ) );
+    scene.fog = new THREE.FogExp2( 0x22243A,0.003);
 
+    // ***** LIGHTS ****** //
+    scene.add( new THREE.AmbientLight( debugObject.ambientlight, 0.2 ) );
     const light=new THREE.DirectionalLight(0xffffff,0.8);
     light.position.set(-50,50,50)
     light.castShadow=true
     const helper=new THREE.DirectionalLightHelper(light,5)
     scene.add(light)
 
+    // ***** LOADERS ****** //
+    const textureLoader = new THREE.TextureLoader()
+    const loader = new GLTFLoader();
 
+
+
+    // ***** GEOMETRIES ****** //
     const sphereGeometry = new THREE.SphereGeometry( 5, 32, 32 );
     const sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
     const sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
     sphere.position.set(0,20,20)
-    sphere.castShadow = true; //default is false
-    sphere.receiveShadow = false; //default
+    // sphere.castShadow = true; //default is false
+    // sphere.receiveShadow = false; //default
     scene.add( sphere );
 
     const geometry = new THREE.PlaneBufferGeometry( 1024, 1024 );
-    plane = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial({color: 0x0000FF}) );
+    plane = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial({color: 0x22243a}) );
     plane.rotation.x= -Math.PI *0.5;
     plane.receiveShadow = true;
-    
-    // plane.rotation.y= -Math.PI *0.5;
     scene.add( plane );
 
-// console.log(scene.children[0].color)
 
-    gui.addColor(debugObject,'scenecolor')
-        .onChange(()=>{
-            scene.background.set(debugObject.scenecolor)
-        });
-    gui.addColor(debugObject,'ambientlight')
-        .onChange(()=>{
-            scene.children[0].color.set(debugObject.ambientlight)
-        });
-
-    /**
-     * Textures
-     */
-    // Texture loader
-const textureLoader = new THREE.TextureLoader()
-
+    // ***** TEXTURES ****** //
     const bakedTexture = textureLoader.load('../assets/VRWorld/Baked.jpg')
     bakedTexture.flipY = false
     bakedTexture.encoding = THREE.sRGBEncoding;
 
-    /**
-     * Materials
-     */
+
     // Baked material
     const bakedMaterial = new THREE.MeshBasicMaterial({ map: bakedTexture })
 
-    // Portal light material
-    // const portalLightMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff })
 
-    // // Pole light material
-    // const poleLightMaterial = new THREE.MeshBasicMaterial({ color: 0xffffe5 })
-
-    /**
-     * Model
-     */
- 
-    const loader = new GLTFLoader();
+    // ***** MODELS ****** //
+    //World Model
 
     loader.load( '../assets/VRWorld/portfolio_v1(defaultmaterials).glb', function ( gltf ) {
         gltf.scene.traverse((child)=>
         {
             child.material = bakedMaterial;
         })
-        gltf.scene.castShadow=true
-        gltf.scene.receiveShadow=true
+        gltf.scene.position.set(0,-2,0)
         scene.add( gltf.scene );
     
     }, undefined, function ( error ) {
@@ -142,16 +125,15 @@ const textureLoader = new THREE.TextureLoader()
     
     } );
 
-     
-    loader.load( './assets/Character/character.glb', function ( gltf ) {
+    //Character Model
+    loader.load( './assets/Character/character3.glb', function ( gltf ) {
 
         const character = gltf.scene;
-        // character.scale.set(0.8,0.8,0.8)
-
-        const mixer = new THREE.AnimationMixer( character );
+        // character.position.set(0,20,0)
         scene.add( character );
+        mixer = new THREE.AnimationMixer( character );
 
-        // setupCharacterAnimations( character, gltf.animations );
+        setupCharacterAnimations( character, gltf.animations );
     }, undefined, function ( e ) {
 
         console.error( e );
@@ -159,9 +141,7 @@ const textureLoader = new THREE.TextureLoader()
     });
 
     
-
     orbitalcontrols();
-    onWindowResize();
     window.addEventListener( 'resize', onWindowResize,false );
 
 }
@@ -181,12 +161,89 @@ function onWindowResize() {
 
 function render(time) {
 
-    time *= 0.001;  // convert time to seconds
     // material.uniforms.uTime.value = time;
+    const dt = clock.getDelta();
+    if ( mixer ){
+        mixer.update( dt );
+        if(DIRECTIONS.some(key=>keysPressed[key] == true)){
+            if(shiftToggle)fadeToAction('run')
+            else fadeToAction('walk')
+        }
+        else{
+            fadeToAction('idle')
+        }
+        if (keysPressed[' '])fadeToAction('jump_start')
+    } 
+
     renderer.render( scene, camera );
     controls.update();// only required if controls.enableDamping = true, or if controls.autoRotate = true
     stats.update();
     requestAnimationFrame( render );
+}
+
+
+const DIRECTIONS=['ArrowUp','ArrowDown','ArrowLeft','ArrowRight']
+const keysPressed = {ArrowUp:false,ArrowDown:false,ArrowLeft:false,ArrowRight:false, ' ':false}
+let shiftToggle=false;
+document.addEventListener('keydown', (e) => {
+        shiftToggle=e.shiftKey
+        if (e.key in keysPressed){
+            keysPressed[e.key]=true
+        }
+    }, false);
+document.addEventListener('keyup', (e) => {
+        shiftToggle=e.shiftKey
+        // console.log(e)
+        if (e.key in keysPressed){
+            keysPressed[e.key]=false
+        } 
+    }, false);
+
+class CharacterController{
+    constructor(){
+
+    }
+}
+
+
+
+
+
+function setupCharacterAnimations( character, animations ) {
+
+    // const states = [ 'catch','death','fall','guard','hit','hit_guard','idle','interact','jump_start','pull','push','put','run','throw','walk'];
+                
+    actions = {};
+
+    for ( let i = 0; i < animations.length; i ++ ) {
+
+        const clip = animations[ i ];
+        const action = mixer.clipAction( clip );
+        actions[ clip.name ] = action;
+        console.log(clip.name)
+
+    }
+    activeAction = actions[ 'idle' ];
+    activeAction.play();
+
+}
+
+function fadeToAction( name ) {
+
+    previousAction = activeAction;
+    activeAction = actions[ name ];
+
+    if ( previousAction !== activeAction ) {
+
+        previousAction.fadeOut(0.5);
+        activeAction
+        .reset()
+        .setEffectiveTimeScale( 1 )
+        .setEffectiveWeight( 1 )
+        .play();
+        // activeAction.crossFadeFrom(previousAction,0.5,true).play();
+
+    }
 }
 
 function orbitalcontrols() {
@@ -199,14 +256,22 @@ function orbitalcontrols() {
     controls.enableZoom = true;
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    // controls.enableRotate = true;
-    // controls.autoRotate = true;
-    // controls.autoRotateSpeed =0.1;
     controls.screenSpacePanning = true;
     // controls.minDistance = 200;
     // controls.maxDistance = 350;
-    controls.maxPolarAngle = Math.PI;
-    // controls.minPolarAngle = -Math.PI / 2;
+    controls.maxPolarAngle = Math.PI/2;
 
 }
 
+function guiPanel() {
+    const gui=new dat.GUI();
+    gui.addColor(debugObject,'scenecolor')
+    .onChange(()=>{
+        scene.background.set(debugObject.scenecolor)
+    });
+    gui.addColor(debugObject,'ambientlight')
+    .onChange(()=>{
+        scene.children[0].color.set(debugObject.ambientlight)
+    });
+    
+}
