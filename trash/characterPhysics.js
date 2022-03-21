@@ -3,10 +3,7 @@ const DIRECTIONS=['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
 import * as CANNON from './cannon-es.js'
 
 
-export default
-
-
-class CharacterController{
+export default class CharacterController{
 
     // temporary data
     walkDirection = new THREE.Vector3()
@@ -20,12 +17,16 @@ class CharacterController{
     walkVelocity = 7
 
     constructor(character,animations,camera,orbitControls,world){
+        this.canJump = true
+        this.wantsJump=false    
         this.character = character;
         this.actions = {};
         this.mixer = new THREE.AnimationMixer( character );
         this.setupCharacterAnimations(animations );
         this.currentAction='idle'
         this.camera = camera;
+        this.hitSound = new Audio('../assets/hit.mp3')
+        // console.log(this.hitSound) 
 
         this.world = world;
         // Cannon.js body
@@ -33,18 +34,21 @@ class CharacterController{
 
         this.body = new CANNON.Body({
             mass: 1,
-            position: new CANNON.Vec3(0, 2.5, 0),
+            position: new CANNON.Vec3(0, 2, 0),
             type: CANNON.Body.RIGID,
             shape: shape,
+            allowSleep: false
+
             // material: defaultMaterial
         })
         this.world.addBody(this.body)
+        
 
         this.camera.position.x=this.character.position.x;
         this.camera.position.y=this.character.position.y+4;
         this.camera.position.z=this.character.position.z+5;
         this.orbitControls = orbitControls;
-        this.updateCameraTarget(0,0);
+        this.updateCameraTarget(0,0,0);
     }
 
     update( keysPressed, shiftToggle,delta) {
@@ -59,7 +63,16 @@ class CharacterController{
 
         this.fadeToAction(play)
         this.mixer.update(delta)
-        let moveX=0,moveZ=0;
+
+        // console.log(this.canJump,this.wantsJump )
+        let moveX=0,moveZ=0,moveY=0;
+        if(this.wantsJump && this.canJump){
+            // this.camera.position.y =this.character.position.y
+            // moveY = 7*delta*100
+            this.body.velocity.y=10
+            this.wantsJump=false
+            this.canJump=false
+        }
         if (this.currentAction == 'run' || this.currentAction == 'walk') {
             // calculate towards camera direction
             var angleYCameraDirection = Math.atan2(
@@ -89,27 +102,35 @@ class CharacterController{
             // move character & camera
             moveX = -this.walkDirection.x * velocity * delta
             moveZ = -this.walkDirection.z * velocity * delta
+            // moveX=this.body.position.x,moveZ=this.body.position.z;
             this.body.velocity.x=-this.walkDirection.x * velocity
             this.body.velocity.z=-this.walkDirection.z * velocity
-            this.character.position.x = this.body.position.x
-            this.character.position.y = this.body.position.y-2
-            this.character.position.z = this.body.position.z
+            // moveX = moveX-this.body.position.x
+            // moveZ = moveZ-this.body.position.z
             // this.character.position.x += moveX
             // this.character.position.z += moveZ
+            // console.log(this.camera) 
         }
-        else this.body.velocity.set(0,0,0);
-
-        this.updateCameraTarget(moveX, moveZ)
+        else{
+            this.body.velocity.x = 0
+            this.body.velocity.z = 0
+            this.body.angularVelocity.set(0,0,0)
+        }
+        this.character.position.x = this.body.position.x
+        this.character.position.y = this.body.position.y-2
+        this.character.position.z = this.body.position.z
+        this.updateCameraTarget(moveX, moveZ,moveY)
         this.orbitControls.update();// only required if controls.enableDamping = true, or if controls.autoRotate = true 
 
     }
-    updateCameraTarget(moveX, moveZ) {
+    updateCameraTarget(moveX, moveZ,moveY) {
         // move camera
         this.camera.position.x += moveX
         this.camera.position.z += moveZ
-        if (this.camera.position.y<0){
-            this.camera.position.y=0
-        }
+        this.camera.position.y += moveY
+        // if (this.camera.position.y<0){
+        //     this.camera.position.y=0
+        // }
 
         // update camera target
         this.cameraTarget.x = this.character.position.x
@@ -133,6 +154,7 @@ class CharacterController{
             .play();
         }
     }
+
     setupCharacterAnimations( animations ) {
         // const states = [ 'catch','death','fall','guard','hit','hit_guard','idle','interact','jump_start','pull','push','put','run','throw','walk'];
         for ( let i = 0; i < animations.length; i ++ ) {
@@ -170,4 +192,3 @@ class CharacterController{
     }
 
 }
-

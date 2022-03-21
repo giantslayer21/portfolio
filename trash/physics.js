@@ -1,13 +1,13 @@
-import * as THREE from './three/build/three.module.js';
-import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
+import * as THREE from '../js/three/build/three.module.js';
+import { OrbitControls } from '../js/three/examples/jsm/controls/OrbitControls.js';
 
-import Stats from './three/examples/jsm/libs/stats.module.js';
-import * as dat from './three/examples/jsm/libs/lil-gui.module.min.js';
+import Stats from '../js/three/examples/jsm/libs/stats.module.js';
+import * as dat from '../js/three/examples/jsm/libs/lil-gui.module.min.js';
 
-import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
-import * as CANNON from './cannon-es.js'
+import { GLTFLoader } from '../js/three/examples/jsm/loaders/GLTFLoader.js';
+import * as CANNON from '../js/cannon-es.js'
 
-import CharacterController from './characterPhysics.js';
+import CharacterController from '../js/characterPhysics.js';
 
 
 /*
@@ -24,7 +24,7 @@ const debugObject = {
 * Canvas
 */
 const canvas = document.querySelector('#canvas' );
-let stats,info,plane;
+let stats,info;
 let camera, scene, renderer,controls;
 let world;
 const objectsToUpdate=[];
@@ -96,9 +96,9 @@ function init() {
 
     // ***** PHYSICS WORLD ****** //
     world = new CANNON.World({
-        gravity: new CANNON.Vec3(0, -10, 0), // m/s²
+        gravity: new CANNON.Vec3(0, -20, 0), // m/s²
         broadphase: new CANNON.SAPBroadphase(world),
-        // allowSleep: true
+        allowSleep: true
     })
     // Default material
     const defaultMaterial = new CANNON.Material('default')
@@ -132,6 +132,16 @@ function init() {
     floorBody.addShape(floorShape)
     floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(- 1, 0, 0), Math.PI * 0.5) 
     world.addBody(floorBody)
+
+    // const floorBox = new CANNON.Body({
+    // mass: 0,
+    // position: new CANNON.Vec3(0, -1, 0),
+    // shape: new CANNON.Box(new CANNON.Vec3(5, 1, 5)),
+    // })
+    // world.addBody(floorBox)
+
+
+
     // Three.js mesh
     characterBoxMesh = new THREE.Mesh(
         new THREE.BoxBufferGeometry(1, 1, 1), 
@@ -145,21 +155,33 @@ function init() {
     characterBoxMesh.scale.set(1,4,1)
     characterBoxMesh.position.set(0,5,0)
     scene.add(characterBoxMesh)
-    // Cannon.js body
-    // const shape = new CANNON.Box(new CANNON.Vec3(0.5, 2, 0.5))
-
-    // const body = new CANNON.Body({
-    // mass: 100,
-    // position: new CANNON.Vec3(0, 12, 0),
-    // shape: shape,
-    // })
-    // world.addBody(body)
 
     
-    // world.addBody(body)
+    // Cannon.js WALL
+    const shape = new CANNON.Box(new CANNON.Vec3(2, 1, 2))
+
+    const body = new CANNON.Body({
+    mass: 0,
+    position: new CANNON.Vec3(5, 1, 0),
+    shape: shape,
+    })
+    world.addBody(body)
+    // Three.js WALL
+    const mesh = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(1, 1, 1), 
+        new THREE.MeshStandardMaterial({
+            // metalness: 0.3,
+            // roughness: 0.4,
+            color: 0xffffff
+        })
+    );
+    mesh.castShadow = true
+    mesh.scale.set(4,2,4)
+    mesh.position.set(0,2,0)
+    scene.add(mesh)
     
     // Save in objects
-    // objectsToUpdate.push({mesh: characterBoxMesh,body: body })
+    objectsToUpdate.push({mesh: mesh,body: body })
 
     // console.log(body.position)
 
@@ -182,21 +204,27 @@ function init() {
     window.addEventListener( 'resize', onWindowResize,false );
 
 }
-
+function collisionJumpCheck(collision){
+    characterControllerInstance.canJump=true
+    // console.log(characterControllerInstance.canJump,characterControllerInstance.wantsJump)
+}
 
 
 function render() {
     // renderer.shadowMap.needsUpdate=true
-
     const dt = clock.getDelta();
-    
     // Update physics
-
     if(characterControllerInstance){
+        characterControllerInstance.body.addEventListener('collide', collisionJumpCheck)
         characterControllerInstance.world.step(1 / 60, dt, 3);
         characterControllerInstance.update(keysPressed,shiftToggle,dt)
-        characterBoxMesh.position.copy(characterControllerInstance.body.position)
-        characterBoxMesh.quaternion.copy(characterControllerInstance.body.quaternion)
+        // characterBoxMesh.position.copy(characterControllerInstance.body.position)
+        // characterBoxMesh.quaternion.copy(characterControllerInstance.body.quaternion)
+    }
+    for(const object of objectsToUpdate)
+    {
+        object.mesh.position.copy(object.body.position)
+        object.mesh.quaternion.copy(object.body.quaternion)
     }
     
     renderer.render( scene, camera );
@@ -209,6 +237,10 @@ function render() {
 
 document.addEventListener('keydown', (e) => {
         shiftToggle=e.shiftKey;
+        if(e.key == ' ' && characterControllerInstance.canJump){
+            // characterControllerInstance.canJump=false
+            characterControllerInstance.wantsJump=true
+        }
         if (e.key in keysPressed){
             keysPressed[e.key]=true;
         }
@@ -217,7 +249,11 @@ document.addEventListener('keyup', (e) => {
         shiftToggle=e.shiftKey;
         if (e.key in keysPressed){
             keysPressed[e.key]=false;
-        } 
+        }
+        if(e.key == ' '){
+            characterControllerInstance.wantsJump=false
+            // characterControllerInstance.canJump=true
+        }
     }, false);
 
 
@@ -232,8 +268,8 @@ function setupOrbitControls() {
     controls.enableDamping = true;
     controls.dampingFactor = 0.1;
     // controls.screenSpacePanning = true;
-    controls.minDistance = 2.4;
-    // controls.maxDistance = 10;
+    controls.minDistance = 9;
+    controls.maxDistance = 10;
     // controls.maxPolarAngle = Math.PI/2;
     controls.update();
 
