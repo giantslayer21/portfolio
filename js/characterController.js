@@ -39,7 +39,7 @@ export default class CharacterController{
             type: CANNON.Body.RIGID,
             shape: shape,
             allowSleep: false,
-            linearDamping:0.9,
+            // linearDamping:1,
             angularDamping:1
             // material: defaultMaterial
         })

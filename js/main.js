@@ -265,7 +265,7 @@ function render() {
     // Update physics
     if(characterControllerInstance){
         characterControllerInstance.body.addEventListener('collide', collisionJumpCheck)
-        characterControllerInstance.world.step(dt);
+        characterControllerInstance.world.step(1/60,dt);
         characterControllerInstance.update(keysPressed,shiftToggle,dt)
         // characterBoxMesh.position.copy(characterControllerInstance.body.position)
         // characterBoxMesh.quaternion.copy(characterControllerInstance.body.quaternion)
