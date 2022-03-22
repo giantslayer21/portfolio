@@ -25,8 +25,12 @@ export default class CharacterController{
         this.setupCharacterAnimations(animations );
         this.currentAction='idle'
         this.camera = camera;
-        this.hitSound = new Audio('../assets/hit.mp3')
-        // console.log(this.hitSound) 
+        // console.log(this.hitSound)
+        this.hitSound = new Audio('./assets/hit.mp3')
+
+        this.hitSound.volume = Math.random()
+        this.hitSound.currentTime = 0
+        this.hitSound.play()
 
         this.world = world;
         // Cannon.js body
@@ -62,19 +66,21 @@ export default class CharacterController{
         } else if (directionPressed) {
             play = 'walk'
         }
-
-        this.fadeToAction(play)
-        this.mixer.update(delta)
-
-        // console.log(this.canJump,this.wantsJump )
-        let moveX=0,moveZ=0,moveY=0;
         if(this.wantsJump && this.canJump){
             // this.camera.position.y =this.character.position.y
             // moveY = 7*delta*100
             this.body.velocity.y=10
             this.wantsJump=false
             this.canJump=false
+            play='fall'
         }
+
+        this.fadeToAction(play)
+        this.mixer.update(delta)
+
+        // console.log(this.canJump,this.wantsJump )
+        let moveX=0,moveZ=0,moveY=0;
+        
         if (this.currentAction == 'run' || this.currentAction == 'walk') {
             // calculate towards camera direction
             var angleYCameraDirection = Math.atan2(

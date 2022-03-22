@@ -8,6 +8,7 @@ import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 import * as CANNON from './cannon-es.js'
 
 import CharacterController from './characterController.js';
+const hitSound = new Audio('./assets/hit.mp3')
 
 
 /*
@@ -244,6 +245,14 @@ function init() {
 
 function collisionJumpCheck(collision){
     characterControllerInstance.canJump=true
+    const impactStrength = collision.contact.getImpactVelocityAlongNormal()
+
+    if(impactStrength > 1.5)
+    {
+        hitSound.volume = Math.random()
+        hitSound.currentTime = 0
+        hitSound.play()
+    }
     // console.log(characterControllerInstance.canJump,characterControllerInstance.wantsJump)
 }
 
