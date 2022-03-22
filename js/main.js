@@ -184,11 +184,11 @@ function init() {
     objectsToUpdate.push({mesh: mesh,body: body })
 
     // ***** TEXTURES ****** //
-    const bakedTexture = textureLoader.load('.././assets/VRWorld/Baked.jpg')
+    const bakedTexture = textureLoader.load('./assets/VRWorld/Baked.jpg')
     bakedTexture.flipY = false
     bakedTexture.encoding = THREE.sRGBEncoding;
 
-    const characterTexture = textureLoader.load('.././assets/Character/Baked.png')
+    const characterTexture = textureLoader.load('./assets/Character/Baked.png')
     characterTexture.flipY = false
     characterTexture.encoding = THREE.sRGBEncoding;
 
@@ -202,7 +202,7 @@ function init() {
     // ***** MODELS ****** //
     //World Model
 
-    loader.load( '.././assets/VRWorld/portfolio_v1(defaultmaterials).glb', function ( gltf ) {
+    loader.load( './assets/VRWorld/portfolio_v1(defaultmaterials).glb', function ( gltf ) {
         gltf.scene.traverse((child)=>
         {
         // console.log(child)
