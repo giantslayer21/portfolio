@@ -1,6 +1,6 @@
-import * as THREE from './three/build/three.module.js';
+import * as THREE from '../js/three/build/three.module.js';
 const DIRECTIONS=['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
-import * as CANNON from './cannon-es.js'
+import * as CANNON from '../js/cannon-es.js'
 
 
 export default class CharacterController{

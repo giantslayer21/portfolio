@@ -13,8 +13,8 @@ export default class CharacterController{
     
     // constants
     fadeDuration= 0.2
-    runVelocity = 20
-    walkVelocity = 7
+    runVelocity = 9
+    walkVelocity = 3
 
     constructor(character,animations,camera,orbitControls,world){
         this.canJump = true
@@ -26,21 +26,20 @@ export default class CharacterController{
         this.currentAction='idle'
         this.camera = camera;
         // console.log(this.hitSound)
-        this.hitSound = new Audio('./assets/hit.mp3')
+        // this.hitSound = new Audio('./assets/hit.mp3')
 
-        this.hitSound.volume = Math.random()
-        this.hitSound.currentTime = 0
-        this.hitSound.play()
+        // this.hitSound.volume = Math.random()
+        // this.hitSound.currentTime = 0
+        // this.hitSound.play()
 
         this.world = world;
         // Cannon.js body
-        // const shape = new CANNON.Box(new CANNON.Vec3(0.5, 2, 0.5))
-        const shape = new CANNON.Sphere(1.5)
+        const shape = new CANNON.Box(new CANNON.Vec3(0.2, 0.5, 0.2))
+        // const shape = new CANNON.Sphere(1.5)
 
         this.body = new CANNON.Body({
             mass: 1,
-            position: new CANNON.Vec3(-5, 10, 60),
-            type: CANNON.Body.RIGID,
+            position: new CANNON.Vec3(0, 10, 30),
             shape: shape,
             allowSleep: false,
             // linearDamping:1,
@@ -51,8 +50,8 @@ export default class CharacterController{
         
 
         this.camera.position.x=this.character.position.x;
-        this.camera.position.y=this.character.position.y+10;
-        this.camera.position.z=this.character.position.z+500;
+        this.camera.position.y=this.character.position.y+3;
+        this.camera.position.z=this.character.position.z+40;
         this.orbitControls = orbitControls;
         this.updateCameraTarget(0,0,0);
     }
@@ -93,7 +92,7 @@ export default class CharacterController{
             this.rotateQuarternion.setFromAxisAngle(this.rotateAngle, angleYCameraDirection + directionOffset)
             this.body.quaternion.copy(this.character.quaternion)
             // this.character.quaternion.rotateTowards(this.body.quaternion, 0.1)
-            this.character.quaternion.rotateTowards(this.rotateQuarternion, 0.1)
+            this.character.quaternion.rotateTowards(this.rotateQuarternion, delta*10)
             
 
             // calculate direction
@@ -118,7 +117,7 @@ export default class CharacterController{
             // moveZ = moveZ-this.body.position.z
             // this.character.position.x += moveX
             // this.character.position.z += moveZ
-            // console.log(this.camera) 
+            // console.log(this.camera.position) 
         }
         else{
             this.body.velocity.x = 0
@@ -126,7 +125,7 @@ export default class CharacterController{
             this.body.angularVelocity.set(0,0,0)
         }
         this.character.position.x = this.body.position.x
-        this.character.position.y = this.body.position.y-2
+        this.character.position.y = this.body.position.y-0.5
         this.character.position.z = this.body.position.z
         this.updateCameraTarget(moveX, moveZ,moveY)
         this.orbitControls.update();// only required if controls.enableDamping = true, or if controls.autoRotate = true 
@@ -136,14 +135,14 @@ export default class CharacterController{
         // move camera
         this.camera.position.x += moveX
         this.camera.position.z += moveZ
-        this.camera.position.y += moveY
-        if (this.camera.position.y<this.character.position.y+1){
-            this.camera.position.y=this.character.position.y+1
-        }
+        // this.camera.position.y += moveY
+        // if (this.camera.position.y<this.character.position.y+1){
+        //     this.camera.position.y=this.character.position.y+1
+        // }
         // console.log(this.camera.position,this.character.position)
         // update camera target
         this.cameraTarget.x = this.character.position.x
-        this.cameraTarget.y = this.character.position.y+3
+        this.cameraTarget.y = this.character.position.y
         this.cameraTarget.z = this.character.position.z
         this.orbitControls.target = this.cameraTarget
 
