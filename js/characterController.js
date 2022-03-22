@@ -42,7 +42,7 @@ export default class CharacterController{
             position: new CANNON.Vec3(0, 10, 30),
             shape: shape,
             allowSleep: false,
-            // linearDamping:1,
+            linearDamping:0.99,
             angularDamping:1
             // material: defaultMaterial
         })
@@ -119,11 +119,11 @@ export default class CharacterController{
             // this.character.position.z += moveZ
             // console.log(this.camera.position) 
         }
-        else{
-            this.body.velocity.x = 0
-            this.body.velocity.z = 0
-            this.body.angularVelocity.set(0,0,0)
-        }
+        // else{
+        //     this.body.velocity.x = 0
+        //     this.body.velocity.z = 0
+        //     this.body.angularVelocity.set(0,0,0)
+        // }
         this.character.position.x = this.body.position.x
         this.character.position.y = this.body.position.y-0.5
         this.character.position.z = this.body.position.z
@@ -142,7 +142,7 @@ export default class CharacterController{
         // console.log(this.camera.position,this.character.position)
         // update camera target
         this.cameraTarget.x = this.character.position.x
-        this.cameraTarget.y = this.character.position.y
+        this.cameraTarget.y = this.character.position.y+2
         this.cameraTarget.z = this.character.position.z
         this.orbitControls.target = this.cameraTarget
 

@@ -118,26 +118,26 @@ function init() {
     /**
      * Floor
      */
-    const floor = new THREE.Mesh(
-        new THREE.PlaneBufferGeometry(10, 10),
-        new THREE.MeshStandardMaterial({
-            color: '#777777',
-            metalness: 0.3,
-            roughness: 0.4,
-        })
-    )
-    floor.receiveShadow = true
-    floor.rotation.x = - Math.PI * 0.5
-    scene.add(floor)
+    // const floor = new THREE.Mesh(
+    //     new THREE.PlaneBufferGeometry(10, 10),
+    //     new THREE.MeshStandardMaterial({
+    //         color: '#777777',
+    //         metalness: 0.3,
+    //         roughness: 0.4,
+    //     })
+    // )
+    // floor.receiveShadow = true
+    // floor.rotation.x = - Math.PI * 0.5
+    // scene.add(floor)
 
-    const floorShape = new CANNON.Plane()
-    const floorBody = new CANNON.Body()
-    floorBody.mass = 0
-    floorBody.addShape(floorShape)
-    floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(- 1, 0, 0), Math.PI * 0.5) 
-    floorBody.position.y=2
-    world.addBody(floorBody)
-    floor.position.copy(floorBody.position)
+    // const floorShape = new CANNON.Plane()
+    // const floorBody = new CANNON.Body()
+    // floorBody.mass = 0
+    // floorBody.addShape(floorShape)
+    // floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(- 1, 0, 0), Math.PI * 0.5) 
+    // floorBody.position.y=2
+    // world.addBody(floorBody)
+    // floor.position.copy(floorBody.position)
 
     // const floorBox = new CANNON.Body({
     // mass: 0,
@@ -216,8 +216,22 @@ function init() {
             // child.scale.set(2,2,2)
             if (child.type==='Mesh'){
                 const box=new THREE.Box3().setFromObject(child)
+                let size=new THREE.Vector3()
+                let center=new THREE.Vector3()
+                box.getSize(size)
+                box.getCenter(center)
                 const helper = new THREE.Box3Helper( box, 0xffff00 );
                 scene.add( helper );
+
+                const boxShape = new CANNON.Box(size.divideScalar(2))
+
+                const boxBody = new CANNON.Body({
+                mass: 0,
+                position: center,
+                shape: boxShape,
+                })
+                world.addBody(boxBody)
+                // console.log(size)
             }
             
         })
