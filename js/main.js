@@ -35,7 +35,17 @@ let character,characterBoxMesh;
 let characterControllerInstance;
 const keysPressed = {ArrowUp:false,ArrowDown:false,ArrowLeft:false,ArrowRight:false, ' ':false};
 let shiftToggle=false;
-
+var logo = document.querySelector(".logo");
+logo.addEventListener("touchstart", handleStart, false);
+logo.addEventListener("touchend", handleEnd, false);
+function handleStart(e){
+    e.preventDefault();
+    keysPressed.ArrowUp=true
+}
+function handleEnd(e){
+    e.preventDefault();
+    keysPressed.ArrowUp=false
+}
 const clock=new THREE.Clock();
 function hasWebGL() {
     const gl =canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
@@ -114,10 +124,6 @@ function init() {
         }
     )
     world.defaultContactMaterial = defaultContactMaterial
-    // createSphere(1,new THREE.Vector3(0,10,0))
-    /**
-     * Floor
-     */
     // const floor = new THREE.Mesh(
     //     new THREE.PlaneBufferGeometry(10, 10),
     //     new THREE.MeshStandardMaterial({
@@ -139,54 +145,7 @@ function init() {
     // world.addBody(floorBody)
     // floor.position.copy(floorBody.position)
 
-    // const floorBox = new CANNON.Body({
-    // mass: 0,
-    // position: new CANNON.Vec3(0, -1, 0),
-    // shape: new CANNON.Box(new CANNON.Vec3(5, 1, 5)),
-    // })
-    // world.addBody(floorBox)
 
-    // Three.js mesh
-    characterBoxMesh = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(0.4, 0.5, 0.4), 
-        new THREE.MeshStandardMaterial({
-            // metalness: 0.3,
-            // roughness: 0.4,
-            color: 0xff0000
-        })
-    );
-    characterBoxMesh.castShadow = true
-    characterBoxMesh.scale.set(1,2,1)
-    characterBoxMesh.position.set(0,5,0)
-    scene.add(characterBoxMesh)
-
-
-    // Cannon.js WALL
-    const shape = new CANNON.Box(new CANNON.Vec3(2, 1, 2))
-
-    const body = new CANNON.Body({
-    mass: 100,
-    position: new CANNON.Vec3(0, 10, 0),
-    shape: shape,
-    linearDamping:0.9,
-    })
-    world.addBody(body)
-    // Three.js WALL
-    const mesh = new THREE.Mesh(
-        new THREE.BoxBufferGeometry(1, 1, 1), 
-        new THREE.MeshStandardMaterial({
-            // metalness: 0.3,
-            // roughness: 0.4,
-            color: 0xffffff
-        })
-    );
-    mesh.castShadow = true
-    mesh.scale.set(4,2,4)
-    mesh.position.set(0,4,0)
-    scene.add(mesh)
-
-    // Save in objects
-    objectsToUpdate.push({mesh: mesh,body: body })
 
     // ***** TEXTURES ****** //
     const bakedTexture = textureLoader.load('./assets/VRWorld/Baked.jpg')
@@ -220,7 +179,7 @@ function init() {
                 let center=new THREE.Vector3()
                 box.getSize(size)
                 box.getCenter(center)
-                const helper = new THREE.Box3Helper( box, 0xffff00 );
+                const helper = new THREE.Box3Helper( box, 0x00ffff );
                 scene.add( helper );
 
                 const boxShape = new CANNON.Box(size.divideScalar(2))

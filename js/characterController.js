@@ -39,7 +39,7 @@ export default class CharacterController{
 
         this.body = new CANNON.Body({
             mass: 1,
-            position: new CANNON.Vec3(0, 10, 30),
+            position: new CANNON.Vec3(0, 3, 30),
             shape: shape,
             allowSleep: false,
             linearDamping:0.99,
@@ -57,6 +57,11 @@ export default class CharacterController{
     }
 
     update( keysPressed, shiftToggle,delta) {
+        // console.log(this.character.position.y)
+        if(this.character.position.y<-10){
+            this.body.position.y=10
+            console.log('yes')
+        }
 
         const directionPressed = DIRECTIONS.some(key => keysPressed[key] == true)
         var play = 'idle';
