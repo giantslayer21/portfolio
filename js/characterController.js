@@ -30,15 +30,17 @@ export default class CharacterController{
 
         this.world = world;
         // Cannon.js body
-        const shape = new CANNON.Box(new CANNON.Vec3(0.5, 2, 0.5))
+        // const shape = new CANNON.Box(new CANNON.Vec3(0.5, 2, 0.5))
+        const shape = new CANNON.Sphere(1.5)
 
         this.body = new CANNON.Body({
             mass: 1,
             position: new CANNON.Vec3(-5, 10, 60),
             type: CANNON.Body.RIGID,
             shape: shape,
-            allowSleep: false
-
+            allowSleep: false,
+            linearDamping:0.9,
+            angularDamping:1
             // material: defaultMaterial
         })
         this.world.addBody(this.body)
@@ -102,7 +104,9 @@ export default class CharacterController{
             // move character & camera
             moveX = -this.walkDirection.x * velocity * delta
             moveZ = -this.walkDirection.z * velocity * delta
+            // this.body.interpolatedPosition.set(this.body.position.x+moveY,this.body.position.y,this.body.position.z+moveZ)
             this.body.velocity.x=-this.walkDirection.x * velocity
+            // this.body.velocity.y=0.5
             this.body.velocity.z=-this.walkDirection.z * velocity
             // moveX = moveX-this.body.position.x
             // moveZ = moveZ-this.body.position.z

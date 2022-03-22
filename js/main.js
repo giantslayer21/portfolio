@@ -106,7 +106,9 @@ function init() {
         defaultMaterial,
         {
             friction: 0,
-            restitution: 0
+            restitution: 0,
+            contactEquationRelaxation : 4
+
         }
     )
     world.defaultContactMaterial = defaultContactMaterial
@@ -130,7 +132,7 @@ function init() {
     floorBody.mass = 0
     floorBody.addShape(floorShape)
     floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(- 1, 0, 0), Math.PI * 0.5) 
-    floorBody.position.y=3.9
+    floorBody.position.y=4.4
     world.addBody(floorBody)
 
     // const floorBox = new CANNON.Body({
@@ -263,10 +265,10 @@ function render() {
     // Update physics
     if(characterControllerInstance){
         characterControllerInstance.body.addEventListener('collide', collisionJumpCheck)
-        characterControllerInstance.world.step(1 / 60, dt, 3);
+        characterControllerInstance.world.step(dt);
         characterControllerInstance.update(keysPressed,shiftToggle,dt)
-        characterBoxMesh.position.copy(characterControllerInstance.body.position)
-        characterBoxMesh.quaternion.copy(characterControllerInstance.body.quaternion)
+        // characterBoxMesh.position.copy(characterControllerInstance.body.position)
+        // characterBoxMesh.quaternion.copy(characterControllerInstance.body.quaternion)
     }
     for(const object of objectsToUpdate)
     {
@@ -279,11 +281,6 @@ function render() {
     requestAnimationFrame( render );
 }
 
-function setupPhysicsWorld(){
-    world = new CANNON.World({
-        gravity: new CANNON.Vec3(0, -10, 0), // m/s²
-    })
-}
 
 
 
@@ -322,7 +319,7 @@ function setupOrbitControls() {
     controls.dampingFactor = 0.1;
     // controls.screenSpacePanning = true;
     controls.minDistance = 9;
-    controls.maxDistance = 10;
+    controls.maxDistance = 20;
     // controls.maxPolarAngle = Math.PI/2;
     controls.update();
 
